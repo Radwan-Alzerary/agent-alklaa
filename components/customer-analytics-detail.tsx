@@ -1,23 +1,28 @@
-"use client"
+"use client";
 
-import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from "recharts"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Customer } from "@/types";
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 interface CustomerAnalyticsDetailProps {
-  customer: {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    totalPurchases: number;
-    loyaltyPoints: number;
-    lastPurchaseDate: string;
-  }
+  customer: Customer;
 }
 
 export function CustomerAnalyticsDetail({ customer }: CustomerAnalyticsDetailProps) {
+  // Simulated purchase history data
   const purchaseHistory = [
     { month: "يناير", purchases: Math.floor(Math.random() * 1000) },
     { month: "فبراير", purchases: Math.floor(Math.random() * 1000) },
@@ -27,6 +32,7 @@ export function CustomerAnalyticsDetail({ customer }: CustomerAnalyticsDetailPro
     { month: "يونيو", purchases: Math.floor(Math.random() * 1000) },
   ];
 
+  // Customer value data for the pie chart
   const customerValue = [
     { name: "المشتريات", value: customer.totalPurchases || 0 },
     { name: "نقاط الولاء", value: customer.loyaltyPoints || 0 },
@@ -34,6 +40,7 @@ export function CustomerAnalyticsDetail({ customer }: CustomerAnalyticsDetailPro
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+      {/* Purchase History */}
       <Card className="col-span-4">
         <CardHeader>
           <CardTitle>سجل المشتريات</CardTitle>
@@ -50,6 +57,8 @@ export function CustomerAnalyticsDetail({ customer }: CustomerAnalyticsDetailPro
           </ResponsiveContainer>
         </CardContent>
       </Card>
+
+      {/* Customer Value */}
       <Card className="col-span-3">
         <CardHeader>
           <CardTitle>قيمة العميل</CardTitle>
@@ -76,6 +85,8 @@ export function CustomerAnalyticsDetail({ customer }: CustomerAnalyticsDetailPro
           </ResponsiveContainer>
         </CardContent>
       </Card>
+
+      {/* Customer Information */}
       <Card className="col-span-7">
         <CardHeader>
           <CardTitle>معلومات العميل</CardTitle>
@@ -86,10 +97,6 @@ export function CustomerAnalyticsDetail({ customer }: CustomerAnalyticsDetailPro
               <dt className="font-semibold">الاسم:</dt>
               <dd>{customer.name}</dd>
             </div>
-            {/* <div>
-              <dt className="font-semibold">البريد الإلكتروني:</dt>
-              <dd>{customer.email}</dd>
-            </div> */}
             <div>
               <dt className="font-semibold">رقم الهاتف:</dt>
               <dd>{customer.phone}</dd>
@@ -110,6 +117,5 @@ export function CustomerAnalyticsDetail({ customer }: CustomerAnalyticsDetailPro
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-

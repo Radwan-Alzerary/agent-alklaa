@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Debt, Customer } from "@/lib/api"
+import { Debt, Customer } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -40,7 +40,7 @@ export function CustomerDebtsList({ customer }: CustomerDebtsListProps) {
   })
 
   const handleAddDebt = async () => {
-    const updatedCustomer = await addDebtToCustomer(customer.id, newDebt)
+    const updatedCustomer = await addDebtToCustomer(customer._id as string, newDebt)
     if (updatedCustomer) {
       setDebts(updatedCustomer.debts)
       setIsAddingDebt(false)
@@ -49,14 +49,14 @@ export function CustomerDebtsList({ customer }: CustomerDebtsListProps) {
   }
 
   const handleUpdateDebt = async (debtId: string, updatedDebt: Partial<Debt>) => {
-    const updatedCustomer = await updateDebtForCustomer(customer.id, debtId, updatedDebt)
+    const updatedCustomer = await updateDebtForCustomer(customer._id as string, debtId, updatedDebt)
     if (updatedCustomer) {
       setDebts(updatedCustomer.debts)
     }
   }
 
   const handleRemoveDebt = async (debtId: string) => {
-    const updatedCustomer = await removeDebtFromCustomer(customer.id, debtId)
+    const updatedCustomer = await removeDebtFromCustomer(customer._id as string, debtId)
     if (updatedCustomer) {
       setDebts(updatedCustomer.debts)
     }
@@ -64,7 +64,7 @@ export function CustomerDebtsList({ customer }: CustomerDebtsListProps) {
 
   const handleRepayDebt = async () => {
     if (selectedDebt) {
-      const updatedCustomer = await repayDebt(customer.id, selectedDebt.id, repaymentAmount)
+      const updatedCustomer = await repayDebt(customer._id as string, selectedDebt.id as string, repaymentAmount)
       if (updatedCustomer) {
         setDebts(updatedCustomer.debts)
         setIsRepayingDebt(false)
@@ -109,7 +109,7 @@ export function CustomerDebtsList({ customer }: CustomerDebtsListProps) {
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={() => handleRemoveDebt(debt.id)}
+                  onClick={() => handleRemoveDebt(debt.id as string)}
                 >
                   حذف
                 </Button>

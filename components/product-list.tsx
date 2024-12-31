@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { DataTable } from "@/components/data-table"
 import { columns } from "@/app/products/columns"
 import { getProducts } from "@/lib/api"
-import { Product } from "@/app/products/columns"
+import { Product } from "@/types"
 
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([])

@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getProducts, getProductCategories } from "@/lib/api"
-import { Product, ProductCategory } from "@/lib/api"
 
 export function ProductCategoryAnalytics() {
   const [data, setData] = useState<{ name: string; count: number }[]>([])

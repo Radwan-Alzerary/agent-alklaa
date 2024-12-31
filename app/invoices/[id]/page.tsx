@@ -76,7 +76,7 @@ export default async function InvoiceDetailPage({ params }: { params: { id: stri
             <tbody>
               {invoice.items.map((item, index) => (
                 <tr key={index}>
-                  <td>{item.productId.name}</td>
+                  <td>{item.productId?.name}</td>
                   <td>{item.quantity}</td>
                   <td>
                     {new Intl.NumberFormat("ar-IQ", { style: "currency", currency: "IQD" }).format(item.price)}

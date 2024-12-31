@@ -16,7 +16,7 @@ export default async function EditProductCategoryPage({ params }: { params: { id
           <CardTitle className="text-3xl font-bold">تعديل فئة المنتج</CardTitle>
         </CardHeader>
         <CardContent>
-          <ProductCategoryForm category={category} />
+          {/* <ProductCategoryForm category={category} /> */}
         </CardContent>
       </Card>
     </div>

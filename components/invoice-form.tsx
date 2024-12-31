@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { CustomProductSearch } from "./custom-product-search";
 import { createInvoice, updateInvoice } from "@/lib/api";
-import { Customer, Product, Invoice, InvoiceItem } from "./types";
+import { Customer, Product, Invoice,Agent, InvoiceItem } from "@/types";
 import { getProducts, getCustomers } from "@/lib/api";
 
 interface InvoiceFormProps {
@@ -25,16 +25,48 @@ interface InvoiceFormProps {
 
 export function InvoiceForm({ invoice }: InvoiceFormProps) {
   const router = useRouter();
+
+
+  const translateStatus = (status: string): 'مدفوعة' | 'معلقة' | 'متأخرة' => {
+    switch (status) {
+      case 'paid':
+        return 'مدفوعة';
+      case 'pending':
+        return 'معلقة';
+      case 'overdue':
+        return 'متأخرة';
+      default:
+        return 'معلقة'; // Default to 'معلقة' if the status is unknown
+    }
+  };
+  
+
+
+
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
 
   // State variables aligned with schema fields
-  const [customerId, setCustomerId] = useState(invoice?.customerId || "");
-  const [agentId, setAgentId] = useState(invoice?.agentId || ""); // Example: logged-in agent
+  const [customerId, setCustomerId] = useState<string>(invoice?.customerId?._id || "");
+  const [agentId, setAgentId] = useState<Agent | undefined>(invoice?.agentId || undefined);
+
   const [date, setDate] = useState(invoice?.date || new Date().toISOString().split("T")[0]);
   const [dueDate, setDueDate] = useState(invoice?.dueDate || "");
-  const [status, setStatus] = useState<'مدفوعة' | 'معلقة' | 'متأخرة'>(invoice?.status || 'معلقة');
-  const [items, setItems] = useState<InvoiceItem[]>(invoice?.items || [{ productId: "", quantity: 1, price: 0 }]);
+  const [status, setStatus] = useState<'مدفوعة' | 'معلقة' | 'متأخرة'>(
+    translateStatus(invoice?.status || 'معلقة')
+
+  );  
+  
+  const [items, setItems] = useState<
+  { description: string; productId: Product; name: string; quantity: number; price: number; }[]
+>(
+  (invoice?.items || []).map((item) => ({
+    ...item,
+    productId: item.productId  || defaultProduct, // Fallback to defaultProduct if productId is undefined
+  }))
+);
+  
+    
   const [totalAmount, setTotalAmount] = useState(invoice?.totalAmount?.toString() || "0");
   const [location, setLocation] = useState({ lat: 0, lng: 0 });
 
@@ -55,18 +87,42 @@ export function InvoiceForm({ invoice }: InvoiceFormProps) {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const invoiceData = {
-      customerId,
-      agentId,
+  
+    const translateStatusToEnglish = (status: 'مدفوعة' | 'معلقة' | 'متأخرة'): 'paid' | 'pending' | 'overdue' => {
+      switch (status) {
+        case 'مدفوعة':
+          return 'paid';
+        case 'معلقة':
+          return 'pending';
+        case 'متأخرة':
+          return 'overdue';
+        default:
+          return 'pending'; // Default to 'pending' if the status is unknown
+      }
+    };
+    const generateInvoiceNumber = (): string => {
+      const now = new Date();
+      return `INV-${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, "0")}${now.getDate().toString().padStart(2, "0")}-${Math.floor(Math.random() * 10000)}`;
+    };
+    
+    const invoiceData: Omit<Invoice, "_id"> = {
+      customerId: customers.find((customer) => customer._id === customerId) as Customer, // Find the full Customer object
+      agentId, // Ensure agentId is always of type Agent
       date,
       dueDate,
-      items,
+      items: items.map(({ description, productId, quantity, price }) => ({
+        description,
+        productId,
+        quantity,
+        price,
+        name: productId.name, // Assuming `name` exists in `Product`
+      })),
       totalAmount: parseFloat(totalAmount),
-      status,
+      status: translateStatusToEnglish(status), // Map Arabic status to English
       location,
+      invoiceNumber: invoice?.invoiceNumber || generateInvoiceNumber(), // Use existing or generate a new number
     };
-
-    try {
+        try {
       if (invoice?._id) {
         await updateInvoice(invoice._id, invoiceData);
       } else {
@@ -78,15 +134,18 @@ export function InvoiceForm({ invoice }: InvoiceFormProps) {
       console.error("Error saving invoice:", error);
     }
   };
-
+      
   const handleProductSelect = (product: Product, index: number) => {
     console.log(product)
+    console.log(index)
     const newItems = [...items];
     newItems[index] = {
-      productId: product._id,
+      ...newItems[index],
+      name:product.name,
+      description: product.name, // Use the product's name as the description
+      productId: product,
       quantity: 1,
       price: product.price,
-      name: product.name,
     };
     setItems(newItems);
     updateTotalAmount(newItems);
@@ -95,20 +154,45 @@ export function InvoiceForm({ invoice }: InvoiceFormProps) {
   const updateItem = (index: number, field: keyof InvoiceItem, value: number | string) => {
     const newItems = [...items];
     newItems[index] = { ...newItems[index], [field]: value };
+  
+    // Optionally validate that `name` is preserved
+    if (!newItems[index].name) {
+      newItems[index].name = items[index].name; // Retain the original name
+    }
+  
     setItems(newItems);
     updateTotalAmount(newItems);
   };
-
+    
   const updateTotalAmount = (items: InvoiceItem[]) => {
     const total = items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
     setTotalAmount(total.toString());
   };
-
-  const addItem = () => {
-  console.log(items)
-    setItems([...items, { productId: "", quantity: 1, price: 0 }]);
+  const defaultProduct: Product = {
+    id: "default-id", // Default ID
+    name: "Default Product", // Default name
+    price: 0, // Default price
+    stock: 0, // Default stock
+    category: "Uncategorized", // Default category
+    status: "Inactive", // Default status
+    description: "Default product description", // Default description
+    image: "", // Default image URL or base64 string
+    barcode: "0000000000", // Default barcode
   };
-
+      
+  const addItem = () => {
+    setItems([
+      ...items,
+      {
+        productId: defaultProduct, // Provide a default Product object
+        name: "New Item", // Default name for a new item
+        description: "Description for new item", // Default description
+        quantity: 1, // Default quantity
+        price: 0, // Default price
+      },
+    ]);
+  };
+  
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4">
       <div className="space-y-2">
@@ -119,7 +203,7 @@ export function InvoiceForm({ invoice }: InvoiceFormProps) {
           </SelectTrigger>
           <SelectContent>
             {customers.map((customer) => (
-              <SelectItem key={customer._id} value={customer._id}>
+              <SelectItem key={customer._id} value={customer._id as string}>
                 {customer.name}
               </SelectItem>
             ))}
@@ -151,16 +235,19 @@ export function InvoiceForm({ invoice }: InvoiceFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="status">الحالة</Label>
-        <Select onValueChange={setStatus} value={status}>
-          <SelectTrigger>
-            <SelectValue placeholder="اختر الحالة" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="مدفوعة">مدفوعة</SelectItem>
-            <SelectItem value="معلقة">معلقة</SelectItem>
-            <SelectItem value="متأخرة">متأخرة</SelectItem>
-          </SelectContent>
-        </Select>
+        <Select
+  onValueChange={(value: string) => setStatus(value as "مدفوعة" | "معلقة" | "متأخرة")}
+  value={status}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="اختر الحالة" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="مدفوعة">مدفوعة</SelectItem>
+          <SelectItem value="معلقة">معلقة</SelectItem>
+          <SelectItem value="متأخرة">متأخرة</SelectItem>
+        </SelectContent>
+      </Select>
       </div>
 
       <div className="space-y-4">

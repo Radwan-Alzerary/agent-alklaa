@@ -1,6 +1,6 @@
 export type Agent = {
-    _id: string;
-    id: string;
+    _id?: string;
+    id?: string;
     name: string;
     email: string;
     phone: string;
@@ -11,8 +11,7 @@ export type Agent = {
   };
   
   export type Customer = {
-    _id:string;
-    id: string;
+    _id?:string;
     name: string;
     tradName:string;
     accountNumber:string;
@@ -32,7 +31,7 @@ export type Agent = {
   };
   
 export type Debt = {
-    id: string;
+    id?: string;
     amount: number;
     recipient: string;
     remainingAmount: number;
@@ -40,45 +39,52 @@ export type Debt = {
   };
   
   export type Product = {
-    _id:string
-    id: string;
+    _id?:string
+    id?: string;
     name: string;
-    category?: string;
     price: number;
     stock: number;
+    category: string | undefined;
     status: string;
     image: string;
+    barcode:string;
+    description:string;
   };
   
   export type ProductCategory = {
-    id: string;
+    id?: string;
     name: string;
     description: string;
   };
   
   export type Payment = {
-    id: string;
-    customerId: string;
-    amount: number;
+    _id?:string;
+    id?: string;
+    customerId: string | Customer; // Union type
+    amount: Number;
     date: string;
-    agentId: Agent;
+    agentId: string | Agent; // Can be an ID (string) when posting or an Agent object when retrieving
   };
   
   export type Invoice = {
-    _id:string;
-    id: string;
+    _id?:string;
+    id?: string;
     customerId: Customer;
-    agentId: Agent;
+    agentId?: Agent;
     invoiceNumber:string;
     date: string;
     dueDate: string;
-    items: Array<{
-    description:string;
-      productId: Product;
-      quantity: number;
-      price: number;
-    }>;
+    items: Array<InvoiceItem>;
     totalAmount: number;
     status: 'paid' | 'pending' | 'overdue';
     location: { lat: number; lng: number };
   };
+
+  export type InvoiceItem = {
+    description: string;
+    productId?:   Product ; // Make it optional
+    quantity: number;
+    price: number;
+    name: string;
+  };
+  

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Payment, Customer } from "@/lib/api"
+import { Payment, Customer } from "@/types"
 import { getCustomerPayments, getCustomerBalance } from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -16,13 +16,13 @@ export function AccountStatement({ customer }: AccountStatementProps) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const fetchedPayments = await getCustomerPayments(customer.id)
-      const fetchedBalance = await getCustomerBalance(customer.id)
+      const fetchedPayments = await getCustomerPayments(customer._id as string)
+      const fetchedBalance = await getCustomerBalance(customer._id as string)
       setPayments(fetchedPayments)
       setBalance(fetchedBalance)
     }
     fetchData()
-  }, [customer.id])
+  }, [customer._id])
 
   return (
     <Card>
@@ -46,8 +46,8 @@ export function AccountStatement({ customer }: AccountStatementProps) {
               <TableRow key={payment.id}>
                 <TableCell>{new Date(payment.date).toLocaleDateString('ar-IQ')}</TableCell>
                 <TableCell>{payment.amount.toFixed(2)} د.ع</TableCell>
-                <TableCell>{payment.agentId}</TableCell>
-              </TableRow>
+                <TableCell>{payment.agentId as string}</TableCell>
+                </TableRow>
             ))}
           </TableBody>
         </Table>

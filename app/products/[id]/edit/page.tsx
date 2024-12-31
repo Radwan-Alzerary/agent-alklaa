@@ -16,7 +16,7 @@ export default async function EditProductPage({ params }: { params: { id: string
           <CardTitle className="text-3xl font-bold">تعديل المنتج</CardTitle>
         </CardHeader>
         <CardContent>
-          <ProductForm product={product} />
+        <ProductForm product={{ ...product, category: product.category || "" }} />
         </CardContent>
       </Card>
     </div>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Invoice } from '@/lib/api'
+import { Invoice } from '@/types'
 
 interface PrintableInvoiceProps {
   invoice: Invoice
@@ -11,8 +11,8 @@ export function PrintableInvoice({ invoice }: PrintableInvoiceProps) {
       <h1 className="text-3xl font-bold mb-6">فاتورة</h1>
       <div className="mb-6">
         <p><strong>رقم الفاتورة:</strong> {invoice.id}</p>
-        <p><strong>معرف العميل:</strong> {invoice.معرف_العميل}</p>
-        <p><strong>تاريخ الاستحقاق:</strong> {invoice.تاريخ_الاستحقاق}</p>
+        <p><strong>معرف العميل:</strong> {invoice.customerId.name}</p>
+        <p><strong>تاريخ الاستحقاق:</strong> {invoice.dueDate}</p>
       </div>
       <table className="w-full mb-6">
         <thead>
@@ -24,18 +24,18 @@ export function PrintableInvoice({ invoice }: PrintableInvoiceProps) {
           </tr>
         </thead>
         <tbody>
-          {invoice.العناصر.map((item, index) => (
+          {invoice.items.map((item, index) => (
             <tr key={index} className="border-b">
-              <td className="py-2">{item.الوصف}</td>
-              <td className="py-2">{item.الكمية}</td>
-              <td className="py-2">{new Intl.NumberFormat("ar-IQ", { style: "currency", currency: "IQD" }).format(item.سعر_الوحدة)}</td>
-              <td className="py-2">{new Intl.NumberFormat("ar-IQ", { style: "currency", currency: "IQD" }).format(item.الكمية * item.سعر_الوحدة)}</td>
+              <td className="py-2">{item.description}</td>
+              <td className="py-2">{item.quantity}</td>
+              <td className="py-2">{new Intl.NumberFormat("ar-IQ", { style: "currency", currency: "IQD" }).format(item.price)}</td>
+              <td className="py-2">{new Intl.NumberFormat("ar-IQ", { style: "currency", currency: "IQD" }).format(item.quantity * item.price)}</td>
             </tr>
           ))}
         </tbody>
       </table>
       <div className="text-right">
-        <p className="text-xl font-bold">المبلغ الإجمالي: {new Intl.NumberFormat("ar-IQ", { style: "currency", currency: "IQD" }).format(invoice.المبلغ)}</p>
+        <p className="text-xl font-bold">المبلغ الإجمالي: {new Intl.NumberFormat("ar-IQ", { style: "currency", currency: "IQD" }).format(invoice.totalAmount)}</p>
       </div>
     </div>
   )

@@ -12,7 +12,7 @@ export default async function AgentAnalyticsPage({ params }: { params: { id: str
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-3xl font-bold mb-6">تحليلات الوكيل: {agent.name}</h1>
-      <AgentAnalyticsDetail agent={agent} />
+      {/* <AgentAnalyticsDetail agent={agent} /> */}
     </div>
   )
 }

@@ -58,7 +58,7 @@ export default async function PrintableInvoicePage({ params }: { params: { id: s
         <tbody>
           {invoice.items.map((item, index) => (
             <tr key={index} className="border-b border-gray-200">
-              <td className="py-2">{item.productId.name || item.description}</td>
+              <td className="py-2">{item.productId?.name || item.description}</td>
               <td className="py-2">{item.quantity}</td>
               <td className="py-2">
                 {new Intl.NumberFormat("ar-IQ", { style: "currency", currency: "IQD" }).format(item.price)}

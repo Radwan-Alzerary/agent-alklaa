@@ -34,7 +34,10 @@ exports.createInvoice = async (req, res) => {
   try {
     const data = req.body
     console.log(req.user)
+    console.log(data)
+
     data.agentId = req.user.id
+    data.invoiceNumber = 0
     console.log(data)
     console.log(data)
     const newInvoice = await Invoice.create(data);

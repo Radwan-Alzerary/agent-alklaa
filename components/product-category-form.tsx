@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { createProductCategory, updateProductCategory } from "@/lib/api"
+// import { createProductCategory, updateProductCategory } from "@/lib/api"
 import { ProductCategory } from "@/app/product-categories/columns"
 import { createCategory } from "@/lib/api"
 
@@ -25,11 +25,11 @@ export function ProductCategoryForm({ category }: ProductCategoryFormProps) {
     setIsLoading(true)
     try {
       const categoryData = { name, description }
-      if (category) {
-        await updateProductCategory(category.id, categoryData)
-      } else {
-        await createCategory(categoryData)
-      }
+      // if (category) {
+      //   await updateProductCategory(category.id, categoryData)
+      // } else {
+      //   await createCategory(categoryData)
+      // }
       router.push("/product-categories")
       router.refresh()
     } catch (error) {

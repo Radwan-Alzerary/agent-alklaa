@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { DataTable } from "@/components/data-table";
 import { columns } from "@/app/invoices/columns";
-import { getInvoices, Invoice } from "@/lib/api";
+import { getInvoices } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { Invoice } from "@/types";
 
 export default function InvoiceList() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);

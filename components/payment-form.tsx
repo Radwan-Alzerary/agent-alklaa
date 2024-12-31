@@ -24,7 +24,7 @@ interface PaymentFormProps {
 export function PaymentForm({ customers, agentId }: PaymentFormProps) {
   const router = useRouter()
   const [customerId, setCustomerId] = useState("")
-  const [amount, setAmount] = useState("")
+  const [amount, setAmount] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,7 +33,7 @@ export function PaymentForm({ customers, agentId }: PaymentFormProps) {
     try {
       await addPayment({
         customerId,
-        amount: parseFloat(amount),
+        amount: amount,
         date: new Date().toISOString(),
         agentId,
       })
@@ -43,7 +43,7 @@ export function PaymentForm({ customers, agentId }: PaymentFormProps) {
       })
       router.refresh()
       setCustomerId("")
-      setAmount("")
+      setAmount(0)
     } catch (error) {
       console.error("Error submitting payment:", error)
       toast({
@@ -66,7 +66,7 @@ export function PaymentForm({ customers, agentId }: PaymentFormProps) {
           </SelectTrigger>
           <SelectContent>
             {customers.map((customer) => (
-              <SelectItem key={customer._id} value={customer._id}>
+              <SelectItem key={customer._id} value={customer._id as string}>
                 {customer.name}
               </SelectItem>
             ))}
@@ -80,10 +80,8 @@ export function PaymentForm({ customers, agentId }: PaymentFormProps) {
           id="amount"
           type="number"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onChange={(e) => setAmount(Number(e.target.value))}
           required
-          // min="0"
-          // step="0.01"
         />
       </div>
       <Button type="submit" disabled={isLoading}>

@@ -44,14 +44,14 @@ app.use(morgan('dev'));
 
 // Routes
 app.use('/api/agents', agentRoutes);
-app.use('/api/customers',protect, customerRoutes);
-app.use('/api/products',protect, productRoutes);
-app.use('/api/categories',protect, categoryRoutes);
-app.use('/api/invoices',protect, invoiceRoutes);
-app.use('/api/payments',protect, paymentRoutes);
-app.use('/api/upload',protect, uploadRoute);
+app.use('/api/customers', customerRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/upload', uploadRoute);
 app.use('/api/auth', authRoutes);
-app.use('/api/users',protect, userRoutes);
+app.use('/api/users', userRoutes);
 
 // Serve static files from the 'uploads' directory
 

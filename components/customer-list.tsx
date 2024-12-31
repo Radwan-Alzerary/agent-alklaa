@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { DataTable } from "@/components/data-table"
 import { columns } from "@/app/customers/columns"
 import { getCustomers } from "@/lib/api"
-import { Customer } from "@/app/customers/columns"
+import { Customer } from "@/types"
 
 export default function CustomerList() {
   const [customers, setCustomers] = useState<Customer[]>([])

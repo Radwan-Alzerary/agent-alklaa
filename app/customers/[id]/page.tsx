@@ -18,10 +18,10 @@ export default async function CustomerProfilePage({ params }: { params: { id: st
         <h1 className="text-3xl font-bold">ملف العميل</h1>
         <div className="flex">
           <Button asChild className="mr-2">
-            <Link href={`/customers/${customer.id}/statement`}>عرض كشف الحساب</Link>
+            <Link href={`/customers/${customer._id}/statement`}>عرض كشف الحساب</Link>
           </Button>
           <Button asChild>
-            <Link href={`/customers/${customer.id}/edit`}>تعديل العميل</Link>
+            <Link href={`/customers/${customer._id}/edit`}>تعديل العميل</Link>
           </Button>
         </div>
       </div>

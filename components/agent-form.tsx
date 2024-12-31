@@ -17,18 +17,19 @@ import { createAgent, updateAgent } from "@/lib/api"
 
 interface AgentFormProps {
   agent?: {
-    id: string
-    _id: string
-    name: string
-    email: string
-    phone: string
-    role: string
+    id?:string;
+    _id?: string; // Adjusted to optional
+    name: string;
+    email: string;
+    phone: string;
+    role: string;
     assignedCustomers: number
   }
 }
 
 export function AgentForm({ agent }: AgentFormProps) {
   const router = useRouter()
+
   const [name, setName] = useState(agent?.name || "")
   const [email, setEmail] = useState(agent?.email || "")
   const [phone, setPhone] = useState(agent?.phone || "")
@@ -73,11 +74,11 @@ export function AgentForm({ agent }: AgentFormProps) {
       }
 
       if (agent) {
-        await updateAgent(agent._id, agentData)
-        alert("تم تحديث الوكيل بنجاح")
+        await updateAgent(agent._id as string, agentData)
+        // alert("تم تحديث الوكيل بنجاح")
       } else {
         await createAgent(agentData)
-        alert("تمت إضافة الوكيل بنجاح")
+        // alert("تمت إضافة الوكيل بنجاح")
       }
       router.push("/agents")
       router.refresh()

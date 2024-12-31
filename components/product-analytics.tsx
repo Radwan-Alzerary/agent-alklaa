@@ -2,7 +2,7 @@
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Product } from "@/lib/api"
+import { Product } from "@/types"
 import { DateRange } from "react-day-picker"
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF6B6B', '#4ECDC4'];
@@ -30,7 +30,7 @@ export function ProductAnalytics({ products, dateRange, interval }: ProductAnaly
       if (existingCategory) {
         existingCategory.value++;
       } else {
-        acc.push({ name: product.category, value: 1 });
+        acc.push({ name: product.category ?? 'Unknown', value: 1 });
       }
       return acc;
     }, [] as { name: string; value: number }[])

@@ -14,8 +14,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createCustomer, updateCustomer, getAgents } from "@/lib/api";
-import { Customer } from "@/app/customers/columns";
-import { Agent, agentColumns } from "@/app/agents/columns";
+import { Customer } from "@/types";
+import { Agent } from "@/types";
 
 const MapComponent = dynamic(() => import("@/components/map-component"), {
   ssr: false,
@@ -66,12 +66,13 @@ export function CustomerForm({ customer }: CustomerFormProps) {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const customerData: Omit<Customer, "id"> = {
+      
+      const customerData: Omit<Customer, "_id"> & { _id?: string } = {
         name,
         tradName,
+        accountNumber,
         email,
         phone,
-        accountNumber,
         category,
         assignedAgent,
         address,
@@ -84,9 +85,9 @@ export function CustomerForm({ customer }: CustomerFormProps) {
         balance: customer?.balance || 0,
         debts: customer?.debts || [],
       };
-
+      
       if (customer) {
-        await updateCustomer(customer._id, customerData); // Update customer via API
+        await updateCustomer(customer._id as string, customerData);
       } else {
         await createCustomer(customerData); // Create new customer via API
       }
@@ -149,7 +150,7 @@ export function CustomerForm({ customer }: CustomerFormProps) {
           </SelectTrigger>
           <SelectContent>
             {agents.map((agent) => (
-              <SelectItem key={agent._id} value={agent._id}>
+              <SelectItem key={agent._id} value={agent._id as string}>
                 {agent.name}
               </SelectItem>
             ))}

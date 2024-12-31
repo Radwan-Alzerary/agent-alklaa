@@ -3,7 +3,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Payment } from "@/types/Payment";
+import { Payment } from "@/types";
 import { getPayments } from "@/lib/api";
 import { DataTable, DataTableRef } from "@/components/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
@@ -51,14 +51,17 @@ const columns: ColumnDef<Payment>[] = [
   //   header: "رقم الدفعة",
   // },
   {
-    accessorFn: (row) => row.customerId?.name || "",
+    accessorFn: (row: Payment) => 
+      typeof row.customerId === 'object' && row.customerId !== null 
+        ? row.customerId.name 
+        : "",
     id: 'customerName',
     header: 'اسم العميل',
     enableSorting: true,
     cell: ({ getValue }) => getValue(),
     filterFn: 'includesString',
   },
-  {
+    {
     accessorKey: "amount",
     header: "المبلغ",
     cell: ({ row }) => {
@@ -79,14 +82,17 @@ const columns: ColumnDef<Payment>[] = [
     },
   },
   {
-    accessorFn: (row) => row.agentId?.name || "",
+    accessorFn: (row: Payment) =>
+      typeof row.agentId === 'object' && row.agentId !== null 
+        ? row.agentId.name 
+        : "",
     id: 'agentName',
     header: 'الوكيل',
     enableSorting: true,
     cell: ({ getValue }) => getValue(),
     filterFn: 'includesString',
   },
-  {
+    {
     id: "actions",
     cell: ({ row }) => {
       const payment = row.original;
@@ -102,7 +108,7 @@ const columns: ColumnDef<Payment>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>الإجراءات</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment._id)}
+              onClick={() => navigator.clipboard.writeText(payment._id as string)}
             >
               نسخ رقم الدفعة
             </DropdownMenuItem>
@@ -218,33 +224,6 @@ export function PaymentsTable() {
               </tr>
             </thead>
             <tbody>
-              ${selectedRows
-                .map((row) => {
-                  const payment = row.original;
-                  const formattedAmount = new Intl.NumberFormat("ar-IQ", {
-                    style: "currency",
-                    currency: "IQD",
-                  }).format(parseFloat(payment.amount));
-                  const formattedDate = new Date(payment.date).toLocaleDateString("ar-IQ");
-
-                  return `
-                    <tr>
-                      <td>${payment.customerId?.name || 'غير متوفر'}</td>
-                      <td>${payment.agentId?.name || 'غير متوفر'}</td>
-                      <td>${formattedAmount}</td>
-                      <td>${formattedDate}</td>
-                    </tr>
-                  `;
-                })
-                .join("")}
-                <tr>
-                  <td colspan="2" class="total-amount">المجموع الكلي</td>
-                  <td class="total-amount">${new Intl.NumberFormat("ar-IQ", {
-                    style: "currency",
-                    currency: "IQD",
-                  }).format(selectedRows.reduce((sum, row) => sum + parseFloat(row.original.amount), 0))}</td>
-                  <td></td>
-                </tr>
             </tbody>
           </table>
         </body>
@@ -270,8 +249,11 @@ export function PaymentsTable() {
   };
 
   // Calculate total amount for filtered payments
-  const totalAmount = filteredPayments.reduce((sum, payment) => sum + parseFloat(payment.amount), 0);
-  const formattedTotalAmount = new Intl.NumberFormat("ar-IQ", {
+  const totalAmount = filteredPayments.reduce((sum, payment) => {
+    const amount = parseFloat(payment.amount as unknown as string); // Explicitly ensure amount is parsed
+    return sum + (isNaN(amount) ? 0 : amount); // Handle cases where amount might not be a valid number
+  }, 0);
+    const formattedTotalAmount = new Intl.NumberFormat("ar-IQ", {
     style: "currency",
     currency: "IQD",
   }).format(totalAmount);

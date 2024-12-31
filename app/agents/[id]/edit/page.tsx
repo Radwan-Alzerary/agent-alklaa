@@ -16,7 +16,7 @@ export default async function EditAgentPage({ params }: { params: { id: string }
           <CardTitle className="text-3xl font-bold">تعديل الوكيل</CardTitle>
         </CardHeader>
         <CardContent>
-          <AgentForm agent={agent} />
+        <AgentForm agent={{ ...agent, id: agent.id || agent._id }} />
         </CardContent>
       </Card>
     </div>

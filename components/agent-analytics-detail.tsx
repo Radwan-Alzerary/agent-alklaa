@@ -5,7 +5,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 interface AgentAnalyticsDetailProps {
   agent: {
-    id: string;
+    id: string | undefined; // Allow id to be undefined
     name: string;
     email: string;
     phone: string;

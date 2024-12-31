@@ -13,16 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
 import Image from "next/image"
-
-export type Product = {
-  id: string
-  name: string
-  category: string
-  price: number
-  stock: number
-  status: string
-  image: string
-}
+import { Product } from "@/types"
 
 export const columns: ColumnDef<Product>[] = [
   {
@@ -92,7 +83,7 @@ export const columns: ColumnDef<Product>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>الإجراءات</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(product._id)}
+              onClick={() => navigator.clipboard.writeText(product._id as string)}
             >
               نسخ معرف المنتج
             </DropdownMenuItem>

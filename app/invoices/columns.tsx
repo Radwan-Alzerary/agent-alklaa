@@ -126,7 +126,7 @@ export const columns: ColumnDef<Invoice>[] = [
           document.body.appendChild(container);
 
           // Render the InvoiceTemplate into the container
-          ReactDOM.render(<InvoiceTemplate invoice={invoice} />, container);
+          // ReactDOM.render(<InvoiceTemplate invoice={invoice} />, container);
 
           // Define PDF options
           const opt = {
@@ -154,7 +154,7 @@ export const columns: ColumnDef<Invoice>[] = [
       const handleDelete = async () => {
         if (confirm('هل أنت متأكد أنك تريد حذف هذه الفاتورة؟')) {
           try {
-            await deleteInvoice(invoice._id);
+            await deleteInvoice(invoice._id as string);
             // toast.success('تم حذف الفاتورة بنجاح!');
             // Optionally, trigger a re-fetch or update state here
           } catch (error) {

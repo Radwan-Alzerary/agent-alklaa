@@ -57,6 +57,7 @@ exports.updateCustomer = async (req, res) => {
 // DELETE customer
 exports.deleteCustomer = async (req, res) => {
   try {
+    console.log(req.params.id)
     const customer = await Customer.findByIdAndDelete(req.params.id);
     if (!customer) return res.status(404).json({ message: 'Customer not found' });
     if (customer.assignedAgent) {

@@ -78,7 +78,7 @@ export const columns: ColumnDef<Customer>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>الإجراءات</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(customer.id)}
+              onClick={() => navigator.clipboard.writeText(customer._id as string)}
             >
               نسخ معرف العميل
             </DropdownMenuItem>
@@ -90,7 +90,7 @@ export const columns: ColumnDef<Customer>[] = [
               <Link href={`/customers/${customer._id}/edit`}>تعديل العميل</Link>
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => deleteCustomer(customer._id)}
+              onClick={() => deleteCustomer(customer._id as string)}
               className="text-red-600"
             >
               حذف العميل

@@ -28,7 +28,7 @@ const InvoiceSchema = new mongoose.Schema({
   totalAmount: { type: Number },
   status: {
     type: String,
-    enum: ['مدفوعة', 'معلقة', 'متأخرة'],
+    // enum: ['مدفوعة', 'معلقة', 'متأخرة'],
     default: 'pending',
   },
   location: {

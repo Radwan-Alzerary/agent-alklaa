@@ -14,7 +14,7 @@ export default function ProductCategoryList() {
     async function fetchCategories() {
       try {
         const fetchedCategories = await getProductCategories()
-        setCategories(fetchedCategories)
+        // setCategories(fetchedCategories)
       } catch (error) {
         console.error("Failed to fetch product categories:", error)
       } finally {

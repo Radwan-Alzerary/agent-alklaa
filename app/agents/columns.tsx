@@ -102,7 +102,7 @@ function ActionMenu({ agent }: ActionMenuProps) {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>الإجراءات</DropdownMenuLabel>
         <DropdownMenuItem
-          onClick={() => navigator.clipboard.writeText(agent._id)}
+          onClick={() => navigator.clipboard.writeText(agent._id as string)}
         >
           نسخ معرف الوكيل
         </DropdownMenuItem>
@@ -114,7 +114,7 @@ function ActionMenu({ agent }: ActionMenuProps) {
           <Link href={`/agents/${agent._id}/edit`}>تعديل الوكيل</Link>
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => handleDelete(agent._id)}
+          onClick={() => handleDelete(agent._id as string)}
           className={`text-red-600 ${isDeleting ? "opacity-50 pointer-events-none" : ""}`}
         >
           {isDeleting ? "جاري الحذف..." : "حذف الوكيل"}

@@ -18,7 +18,7 @@ import {
   RadioGroupItem,
 } from "@/components/ui/radio-group"
 import { createProduct, updateProduct } from "@/lib/api"
-import { Product } from "@/app/products/columns"
+import { Product } from "@/types"
 
 interface ProductFormProps {
   product?: Product
@@ -27,6 +27,7 @@ interface ProductFormProps {
 export function ProductForm({ product }: ProductFormProps) {
   const router = useRouter()
   const [name, setName] = useState(product?.name || "")
+  const [description, setDescription] = useState(product?.description || "")
   const [category, setCategory] = useState(product?.category || "")
   const [price, setPrice] = useState(product?.price.toString() || "")
   const [stock, setStock] = useState(product?.stock.toString() || "")
@@ -131,7 +132,7 @@ export function ProductForm({ product }: ProductFormProps) {
         throw new Error("Image URL is required")
       }
 
-      const productData = {
+      const productData: Omit<Product, '_id'> = {
         name,
         category,
         price: parseFloat(price),
@@ -139,13 +140,15 @@ export function ProductForm({ product }: ProductFormProps) {
         status,
         image: finalImageUrl,
         barcode,
-      }
-      if (product) {
-        await updateProduct(product._id, productData)
-      } else {
-        await createProduct(productData)
-      }
+        description
+      };
 
+      if (product) {
+        await updateProduct(product._id as string, productData);
+      } else {
+        await createProduct(productData);
+      }
+      
       alert(product ? "تم تحديث المنتج بنجاح" : "تمت إضافة المنتج بنجاح")
       router.push("/products")
       router.refresh()

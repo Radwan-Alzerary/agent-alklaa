@@ -75,33 +75,6 @@ export type InvoiceAR = {
 // Mock Data (if needed locally, e.g. getCustomerProfile, etc.)
 // -----------------------------------------------------------------------------
 
-let invoices: Invoice[] = [
-  {
-    id: "1",
-    customerId: "1",
-    agentId: "1",
-    date: "2023-05-15",
-    dueDate: "2023-06-15",
-    items: [
-      { productId: "1", quantity: 2, price: 299.99 },
-      { productId: "2", quantity: 1, price: 999.99 },
-    ],
-    totalAmount: 1599.97,
-    status: 'paid',
-    location: { lat: 33.315241, lng: 44.366145 },
-  },
-  {
-    id: "2",
-    customerId: "2",
-    agentId: "2",
-    date: "2023-06-01",
-    dueDate: "2023-07-01",
-    items: [{ productId: "2", quantity: 1, price: 999.99 }],
-    totalAmount: 999.99,
-    status: 'pending',
-    location: { lat: 30.508328, lng: 47.783173 },
-  },
-];
 
 // -----------------------------------------------------------------------------
 // Customers
@@ -116,9 +89,10 @@ export async function getCustomers(): Promise<Customer[]> {
 }
 
 
-export async function getCustomer(id: string): Promise<Customer> {
+export async function getCustomer(_id: string): Promise<Customer> {
   try {
-    const response = await api.get<Customer>(`/customers/${id}`);
+    console.log(_id)
+    const response = await api.get<Customer>(`/customers/${_id}`);
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Failed to fetch customer");
@@ -126,7 +100,7 @@ export async function getCustomer(id: string): Promise<Customer> {
 }
 
 
-export async function createCustomer(customer: Omit<Customer, "id">): Promise<Customer> {
+export async function createCustomer(customer: Omit<Customer, "_id">): Promise<Customer> {
   try {
     const response = await api.post<Customer>("/customers", customer);
     return response.data;
@@ -135,9 +109,9 @@ export async function createCustomer(customer: Omit<Customer, "id">): Promise<Cu
   }
 }
 
-export async function updateCustomer(id: string, customerData: Partial<Customer>): Promise<Customer> {
+export async function updateCustomer(_id: string, customerData: Partial<Customer>): Promise<Customer> {
   try {
-    const response = await api.put<Customer>(`/customers/${id}`, customerData);
+    const response = await api.put<Customer>(`/customers/${_id}`, customerData);
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Failed to update customer");
@@ -367,10 +341,10 @@ export async function deleteInvoiceAR(id: string): Promise<void> {
 // -----------------------------------------------------------------------------
 
 
-export async function getInvoicesByAgent(agentId: string): Promise<Invoice[]> {
-  // Using local mock data
-  return invoices.filter((invoice) => invoice.agentId === agentId);
-}
+// export async function getInvoicesByAgent(agentId: string): Promise<Invoice[]> {
+//   // Using local mock data
+//   return undefined;
+// }
 
 export async function updateProductStock(
   productId: string,
@@ -391,12 +365,6 @@ export async function calculateAgentPerformance(
   agentId: string
 ): Promise<{ totalSales: number; averageRating: number }> {
   const agent = await getAgent(agentId);
-  if (agent) {
-    const agentInvoices = await getInvoicesByAgent(agentId);
-    const totalSales = agentInvoices.reduce((sum, invoice) => sum + invoice.totalAmount, 0);
-    const averageRating = agent.averageRating; // or fetch from your own logic
-    return { totalSales, averageRating };
-  }
   return { totalSales: 0, averageRating: 0 };
 }
 
@@ -404,13 +372,6 @@ export async function addDebtToCustomer(
   customerId: string,
   debt: Omit<Debt, "id">
 ): Promise<Customer | undefined> {
-  // Local logic example
-  const customer = customers.find((c) => c.id === customerId);
-  if (customer) {
-    const newDebt = { ...debt, id: String(customer.debts.length + 1) };
-    customer.debts.push(newDebt);
-    return customer;
-  }
   return undefined;
 }
 
@@ -420,17 +381,6 @@ export async function updateDebtForCustomer(
   debtData: Partial<Debt>
 ): Promise<Customer | undefined> {
   // Local logic example
-  const customer = customers.find((c) => c.id === customerId);
-  if (customer) {
-    const debtIndex = customer.debts.findIndex((d) => d.id === debtId);
-    if (debtIndex !== -1) {
-      customer.debts[debtIndex] = {
-        ...customer.debts[debtIndex],
-        ...debtData,
-      };
-      return customer;
-    }
-  }
   return undefined;
 }
 
@@ -439,11 +389,6 @@ export async function removeDebtFromCustomer(
   debtId: string
 ): Promise<Customer | undefined> {
   // Local logic example
-  const customer = customers.find((c) => c.id === customerId);
-  if (customer) {
-    customer.debts = customer.debts.filter((d) => d.id !== debtId);
-    return customer;
-  }
   return undefined;
 }
 
@@ -453,22 +398,6 @@ export async function repayDebt(
   amount: number
 ): Promise<Customer | undefined> {
   // Local logic example
-  const customer = customers.find((c) => c.id === customerId);
-  if (customer) {
-    const debtIndex = customer.debts.findIndex((d) => d.id === debtId);
-    if (debtIndex !== -1) {
-      const debt = customer.debts[debtIndex];
-      const newRemainingAmount = Math.max(0, debt.remainingAmount - amount);
-      customer.debts[debtIndex] = {
-        ...debt,
-        remainingAmount: newRemainingAmount,
-      };
-      if (newRemainingAmount === 0) {
-        customer.debts.splice(debtIndex, 1);
-      }
-      return customer;
-    }
-  }
   return undefined;
 }
 
