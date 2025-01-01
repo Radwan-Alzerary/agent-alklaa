@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/radio-group"
 import { createProduct, updateProduct } from "@/lib/api"
 import { Product } from "@/types"
+import { API_URL } from '@/lib/apiUrl';
 
 interface ProductFormProps {
   product?: Product
@@ -99,7 +100,7 @@ export function ProductForm({ product }: ProductFormProps) {
     formData.append("image", selectedFile)
 
     try {
-      const response = await fetch("http://localhost:4000/api/upload", {
+      const response = await fetch(`${API_URL}/upload`, {
         method: "POST",
         body: formData,
       })

@@ -1,6 +1,6 @@
 // lib/authFetch.ts
 
-const API_URL = "http://localhost:4000/api"; // Update with your backend URL
+import { API_URL } from './apiUrl';
 
 /**
  * A helper function that wraps the fetch API and includes the Authorization header.
@@ -28,7 +28,7 @@ export async function authFetch<T>(
   }
 
   try {
-    const response = await fetch(`${API_URL}${endpoint}`, options);
+    const response = await fetch(`${API_URL}/${endpoint}`, options);
 
     // Handle unauthorized access
     if (response.status === 401) {

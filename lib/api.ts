@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getAuthCookie } from "./cookieUtils"; // <-- import the cookie helper
 import { Agent,Customer,Debt,Product,ProductCategory,Payment,Invoice } from "@/types";
-
+import { API_URL } from './apiUrl';
 
 
 
@@ -10,7 +10,6 @@ import { Agent,Customer,Debt,Product,ProductCategory,Payment,Invoice } from "@/t
 // -----------------------------------------------------------------------------
 // Common Setup
 // -----------------------------------------------------------------------------
-export const API_URL = "http://localhost:4000/api"; // Base API for main endpoints
 
 /**
  * Helper function to add auth token to fetch headers

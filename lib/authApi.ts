@@ -1,10 +1,11 @@
 // lib/api.ts
 
 import axios from 'axios';
+import { API_URL } from './apiUrl';
 
 // Create an Axios instance
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: API_URL,
 });
 
 // Helper function to get the token from localStorage (only in the browser)

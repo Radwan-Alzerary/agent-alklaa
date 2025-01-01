@@ -7,6 +7,7 @@ import api from "@/lib/authApi";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import { setAuthCookie, getAuthCookie, removeAuthCookie } from "@/lib/cookieUtils"; // <--- import cookie helpers
+import { API_URL } from '@/lib/apiUrl';
 
 interface User {
   id: string;
@@ -46,7 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Adjust endpoint if needed
       const endpoint =
         role === "user"
-          ? "http://localhost:4000/api/auth/login/user"
+          ? `${API_URL}/auth/login/user`
           : "/auth/login/agent";
       const response = await api.post(endpoint, { email, password });
 
