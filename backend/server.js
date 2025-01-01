@@ -4,7 +4,7 @@ const morgan = require("morgan");
 
 app.use(morgan("dev"));
 
-const PORT = process.env.PORT || 4010;
+const PORT =   4010;
 const MONGODB_URI = 'mongodb://127.0.0.1:27017/sales-management';
 
 mongoose
