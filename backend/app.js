@@ -34,6 +34,9 @@ const corsOptions = {
     /^(http:\/\/.+:5000)$/,
     /^(http:\/\/.+:3001)$/,
     /^(http:\/\/.+:3100)$/,
+    /^(http:\/\/.+:443)$/,
+    'https://agent.niuraiq.com/', // Add specific domain
+
   ],
   credentials: true,
   "Access-Control-Allow-Credentials": true,
