@@ -142,7 +142,7 @@ export function CustomerForm({ customer }: CustomerFormProps) {
       <div>
         <Label htmlFor="assignedAgent">الوكيل المعين</Label>
         <Select
-          value={assignedAgent} // Bind the Select value to the state
+          value={assignedAgent as string} // Bind the Select value to the state
           onValueChange={(value) => setAssignedAgent(value)} // Update state on selection
         >
           <SelectTrigger>

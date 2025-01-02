@@ -5,6 +5,7 @@ const Customer = require('../models/Customer');
 exports.getPayments = async (req, res) => {
   try {
     const payments = await Payment.find().populate('customerId').populate('agentId');
+    console.log(payments)
     res.json(payments);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -25,9 +26,8 @@ exports.getCustomerPayments = async (req, res) => {
 // CREATE payment
 exports.createPayment = async (req, res) => {
   try {
-    console.log(req.user)
-    console.log(req.body)
-
+    const data = req.body
+    data.agentId = req.user.id
     const newPayment = await Payment.create(req.body);
     // Update customer balance
     await Customer.findByIdAndUpdate(req.body.customerId, {

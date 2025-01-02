@@ -8,7 +8,7 @@ const DebtSchema = new mongoose.Schema({
 });
 
 const CustomerSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true,default:"" },
   tradName:{type:String},
   email: { type: String },
   phone: { type: String },
@@ -16,7 +16,7 @@ const CustomerSchema = new mongoose.Schema({
   accountNumber:{type:String},
   assignedAgent: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Agent',
+    ref: 'Agent',require
   },
   address: { type: String },
   nearestPlace: { type: String },

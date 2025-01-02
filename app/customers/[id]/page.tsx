@@ -50,7 +50,9 @@ export default async function CustomerProfilePage({ params }: { params: { id: st
               </div>
               <div>
                 <dt className="font-semibold">الوكيل المعين:</dt>
-                <dd>{customer.assignedAgent}</dd>
+                {typeof customer.assignedAgent === "object" && customer.assignedAgent?.name 
+                ? customer.assignedAgent.name 
+                : "No agent assigned"}
               </div>
             </dl>
           </CardContent>
@@ -71,7 +73,7 @@ export default async function CustomerProfilePage({ params }: { params: { id: st
               </div>
               <div>
                 <dt className="font-semibold">الموقع:</dt>
-                <dd>خط العرض: {customer.location.lat}, خط الطول: {customer.location.lng}</dd>
+                <dd>خط العرض: {customer.location?.lat}, خط الطول: {customer.location?.lng}</dd>
               </div>
             </dl>
           </CardContent>

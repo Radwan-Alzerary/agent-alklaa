@@ -25,7 +25,6 @@ import { format } from "date-fns";
 import { arSA } from 'date-fns/locale';
 import { subDays, addDays } from 'date-fns';
 
-// Define the columns for the DataTable
 const columns: ColumnDef<Payment>[] = [
   {
     id: "select",
@@ -46,10 +45,6 @@ const columns: ColumnDef<Payment>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  // {
-  //   accessorKey: "id",
-  //   header: "رقم الدفعة",
-  // },
   {
     accessorFn: (row: Payment) => 
       typeof row.customerId === 'object' && row.customerId !== null 
@@ -61,7 +56,7 @@ const columns: ColumnDef<Payment>[] = [
     cell: ({ getValue }) => getValue(),
     filterFn: 'includesString',
   },
-    {
+  {
     accessorKey: "amount",
     header: "المبلغ",
     cell: ({ row }) => {
@@ -92,7 +87,7 @@ const columns: ColumnDef<Payment>[] = [
     cell: ({ getValue }) => getValue(),
     filterFn: 'includesString',
   },
-    {
+  {
     id: "actions",
     cell: ({ row }) => {
       const payment = row.original;
@@ -124,12 +119,10 @@ export function PaymentsTable() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const tableRef = useRef<DataTableRef<Payment>>(null);
-  const pdfRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [filteredPayments, setFilteredPayments] = useState<Payment[]>([]);
 
-  // Fetch payments on component mount
   useEffect(() => {
     const fetchPaymentsData = async () => {
       setLoading(true);
@@ -146,7 +139,6 @@ export function PaymentsTable() {
     fetchPaymentsData();
   }, []);
 
-  // Update filtered payments based on date selection
   useEffect(() => {
     if (date) {
       const formattedDate = date.toISOString().split('T')[0];
@@ -160,34 +152,6 @@ export function PaymentsTable() {
     }
   }, [date, payments]);
 
-  const handleFilterByToday = () => {
-    const today = new Date();
-    setDate(today);
-  };
-
-  const handleFilterByYesterday = () => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    setDate(yesterday);
-  };
-
-  const handleClearFilter = () => {
-    setDate(undefined);
-  };
-
-  const handleDayBack = () => {
-    if (date) {
-      setDate(subDays(date, 1));
-    }
-  };
-
-  const handleDayNext = () => {
-    if (date) {
-      setDate(addDays(date, 1));
-    }
-  };
-
-  // Handle PDF download for selected payments
   const handleDownloadPdf = async () => {
     const selectedRows = tableRef.current?.getSelectedRowModel().rows || [];
 
@@ -199,21 +163,45 @@ export function PaymentsTable() {
     setIsGenerating(true);
 
     try {
-      // Generate HTML content for the selected payments in a table format
+      const totalAmount = selectedRows.reduce((sum, row) => {
+        const amount = typeof row.original.amount === 'number' ? row.original.amount : parseFloat(row.original.amount as unknown as string);
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
+      
+      const formattedTotalAmount = new Intl.NumberFormat("ar-IQ", {
+        style: "currency",
+        currency: "IQD",
+      }).format(totalAmount);
+
+      const rowsHtml = selectedRows.map(row => {
+        const payment = row.original;
+        return `
+          <tr>
+            <td>${typeof payment.customerId === 'object' && payment.customerId !== null ? payment.customerId.name : payment.customerId || ""}</td>
+            <td>${typeof payment.agentId === 'object' && payment.agentId !== null ? payment.agentId.name : payment.agentId || ""}</td>
+            <td>${new Intl.NumberFormat("ar-IQ", {
+              style: "currency",
+              currency: "IQD",
+          }).format(Number(payment.amount))}</td>
+            <td>${new Date(payment.date).toLocaleDateString("ar-IQ")}</td>
+          </tr>
+        `;
+      }).join('');
+
       const htmlContent = `
         <html lang="ar" dir="rtl">
         <head>
           <meta charset="UTF-8">
           <style>
             body { font-family: 'Arial', sans-serif; direction: rtl; }
-            h2 { text-align: center; }
+            h2, .total { text-align: center; }
             table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
             th, td { border: 1px solid #ddd; padding: 8px; text-align: right; }
             th { background-color: #f2f2f2; }
-            .total-amount { font-weight: bold; }
           </style>
         </head>
         <body>
+          <h2>تقرير الدفعات</h2>
           <table>
             <thead>
               <tr>
@@ -224,21 +212,24 @@ export function PaymentsTable() {
               </tr>
             </thead>
             <tbody>
+              ${rowsHtml}
             </tbody>
           </table>
+          <div class="total">
+            <strong>المجموع الكلي: ${formattedTotalAmount}</strong>
+          </div>
         </body>
         </html>
       `;
 
       const opt = {
-        margin:       10,
+        margin:       2,
         filename:     'selected_payments.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2 },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
-      // Generate and save the PDF
       await html2pdf().from(htmlContent).set(opt).save();
     } catch (error) {
       console.error("Error generating PDF:", error);
@@ -248,16 +239,6 @@ export function PaymentsTable() {
     }
   };
 
-  // Calculate total amount for filtered payments
-  const totalAmount = filteredPayments.reduce((sum, payment) => {
-    const amount = parseFloat(payment.amount as unknown as string); // Explicitly ensure amount is parsed
-    return sum + (isNaN(amount) ? 0 : amount); // Handle cases where amount might not be a valid number
-  }, 0);
-    const formattedTotalAmount = new Intl.NumberFormat("ar-IQ", {
-    style: "currency",
-    currency: "IQD",
-  }).format(totalAmount);
-
   if (loading) {
     return <div>جارٍ التحميل...</div>;
   }
@@ -265,59 +246,9 @@ export function PaymentsTable() {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <div>
-          <Button onClick={handleDownloadPdf} className="ml-2" disabled={isGenerating}>
-            {isGenerating ? "جارٍ توليد PDF..." : "تنزيل PDF المحدد"}
-          </Button>
-        </div>
-        <div>
-          <span>المجموع الكلي: </span>
-          <span className="font-bold">{formattedTotalAmount}</span>
-        </div>
-      </div>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <Button onClick={handleDayBack} variant="outline" disabled={!date}>
-            اليوم السابق
-          </Button>
-          <Button onClick={handleFilterByToday} variant="outline">
-            اليوم
-          </Button>
-          <Button onClick={handleFilterByYesterday} variant="outline">
-            الأمس
-          </Button>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={cn(
-                  'justify-start text-left font-normal',
-                  !date && 'text-muted-foreground'
-                )}
-              >
-                {/* <Calendar className="mr-2 h-4 w-4" /> */}
-                {date ? format(date, "PPP", { locale: arSA }) : <span>اختر التاريخ</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-2 hid" align="end">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                locale={arSA}
-                pagedNavigation
-              />
-            </PopoverContent>
-          </Popover>
-          {date && (
-            <Button onClick={handleClearFilter} variant="outline" size="sm">
-              مسح الفلتر
-            </Button>
-          )}
-          <Button onClick={handleDayNext} variant="outline" disabled={!date}>
-            اليوم التالي
-          </Button>
-        </div>
+        <Button onClick={handleDownloadPdf} className="ml-2" disabled={isGenerating}>
+          {isGenerating ? "جارٍ توليد PDF..." : "تنزيل PDF المحدد"}
+        </Button>
       </div>
       <DataTable
         ref={tableRef}
@@ -325,7 +256,6 @@ export function PaymentsTable() {
         data={filteredPayments}
         searchKey="customerId.name"
         enableRowSelection
-        dateField="date"
       />
     </div>
   );

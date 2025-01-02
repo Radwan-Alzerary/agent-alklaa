@@ -3,12 +3,48 @@ const router = express.Router();
 const customerController = require('../controllers/customerController');
 const Customer = require('../models/Customer');
 const Payment = require('../models/Payment');
+const xlsx = require('xlsx');
+const fs = require('fs');
+const Agent = require('../models/Agent');
 
 router.get('/', customerController.getCustomers);
 router.get('/:id', customerController.getCustomer);
 router.post('/', customerController.createCustomer);
 router.put('/:id', customerController.updateCustomer);
 router.delete('/:id', customerController.deleteCustomer);
+
+router.get('/data/import', async (req,res)=>{
+  try {
+    const filePath = 'data.xlsx'; // Replace with the path to your Excel file
+    const workbook = xlsx.readFile(filePath);
+    const sheetName = workbook.SheetNames[0];
+    const sheetData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    const agentFind = await Agent.findOne({name:"عائد سليمان"})
+    console.log(sheetData)
+
+
+    // // Prepare and insert data into MongoDB
+    const trades = sheetData.map((row) => ({
+      name:row.tradeName,
+      phone :row.phoneNumber,
+      accountNumber :row.num,
+      assignedAgent : agentFind.id,
+      address :row.address
+      }));
+
+    await Customer.insertMany(trades);
+
+    res.status(200).json({ message: 'Data imported successfully',  });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to import data', error });
+  }
+
+});
+
+
+
 
 router.post('/:customerId/debts', customerController.addDebtToCustomer);
 router.post('/:customerId/debts/:debtId/repay', customerController.repayDebt);

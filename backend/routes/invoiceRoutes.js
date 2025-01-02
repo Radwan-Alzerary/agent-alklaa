@@ -5,7 +5,7 @@ const { protect } = require('../middleware/authMiddleware');
 
 router.get('/', invoiceController.getInvoices);
 router.get('/:id', invoiceController.getInvoice);
-router.post('/', invoiceController.createInvoice);
+router.post('/',protect, invoiceController.createInvoice);
 router.put('/:id', invoiceController.updateInvoice);
 router.delete('/:id', invoiceController.deleteInvoice);
 

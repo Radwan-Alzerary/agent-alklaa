@@ -18,7 +18,7 @@ export type Agent = {
     email: string;
     phone: string;
     category: string;
-    assignedAgent: string;
+    assignedAgent:string | Agent;
     address: string;
     nearestPlace: string;
     location: { lat: number; lng: number };

@@ -177,154 +177,188 @@ const handlePrintSelected = () => {
     return;
   }
 
-  // try {
-  //   const pdf = new jsPDF();
+  try {
+    const pdf = new jsPDF();
 
-  //   pdf.addFileToVFS('Amiri-Regular-normal.ttf', AmiriFont); 
-  //   pdf.addFont('Amiri-Regular-normal.ttf', 'Amiri', 'normal');
-  //   pdf.addFileToVFS('Amiri-Bold-normal.ttf', AmiriBoldFont); 
-  //   pdf.addFont('Amiri-Bold-normal.ttf', 'Amiri-Bold', 'bold');
-  //   pdf.setFont('Amiri-Bold', 'bold');
-  //   pdf.setTextColor(0, 0, 0);
+    pdf.addFileToVFS('Amiri-Regular-normal.ttf', AmiriFont); 
+    pdf.addFont('Amiri-Regular-normal.ttf', 'Amiri', 'normal');
+    pdf.addFileToVFS('Amiri-Bold-normal.ttf', AmiriBoldFont); 
+    pdf.addFont('Amiri-Bold-normal.ttf', 'Amiri-Bold', 'bold');
+    pdf.setFont('Amiri-Bold', 'bold');
+    pdf.setTextColor(0, 0, 0);
 
-  //   selectedRows.forEach((row, invoiceIndex) => {
-  //     const invoice = row.original;
-
-  //     const drawHeader = (pageNum: number, totalPages: number) => {
-  //       pdf.setFontSize(16);
-  //       pdf.setFontSize(10);
-  //       pdf.text(`${pageNum}-${totalPages}`, pdf.internal.pageSize.getWidth() - 10, 10, { align: 'right' });
+    selectedRows.forEach((row, invoiceIndex) => {
+      const invoice = row.original as {
+        date: string;
+        invoiceNumber: string;
+        customerId?: {
+          serial?: string;
+          name?: string;
+          tradName?: string;
+          phone?: string;
+          address?: string;
+        };
+        agentId?: {
+          name?: string;
+        };
+        items: Array<{
+          productId: {
+            barcode: string;
+            name: string;
+          };
+          quantity: number;
+        }>;
+      };
       
-  //       if (pageNum === 1) {
-  //         let currentY = 10;
-  //         pdf.setFontSize(12);
-  //         pdf.setFont('Amiri-Bold', 'bold');
-  //         const formattedDate = new Date(invoice.date).toLocaleDateString('en-GB', {
-  //           year: 'numeric',
-  //           month: '2-digit',
-  //           day: '2-digit',
-  //         });
+      const drawHeader = (pageNum: number, totalPages: number) => {
+        pdf.setFontSize(16);
+        pdf.setFontSize(10);
+        pdf.text(`${pageNum}-${totalPages}`, pdf.internal.pageSize.getWidth() - 10, 10, { align: 'right' });
       
-  //         pdf.text(`رقم الفاتورة: ${invoice.invoiceNumber}`, 10, currentY);
-  //         pdf.text(`التاريخ: ${formattedDate}`, 80, currentY);
-  //         pdf.text(` ${invoice.customerId?.serial || "4"}`, 100, currentY + 10);
-  //         pdf.text(
-  //           `اسم العميل: ${invoice.customerId?.name || ""}`,
-  //           pdf.internal.pageSize.getWidth() - 80,
-  //           currentY
-  //         );
-  //         currentY += 8;
+        if (pageNum === 1) {
+          let currentY = 10;
+          pdf.setFontSize(12);
+          pdf.setFont('Amiri-Bold', 'bold');
+          const formattedDate = new Date(invoice.date).toLocaleDateString('en-GB', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          });
       
-  //         pdf.text(
-  //           `الاسم التجاري: ${invoice.customerId?.tradName || ""}`,
-  //           pdf.internal.pageSize.getWidth() - 80,
-  //           currentY
-  //         );
+          pdf.text(`رقم الفاتورة: ${invoice.invoiceNumber}`, 10, currentY);
+          pdf.text(`التاريخ: ${formattedDate}`, 80, currentY);
+          pdf.text(` ${invoice.customerId?.serial || "4"}`, 100, currentY + 10);
+          pdf.text(
+            `اسم العميل: ${invoice.customerId?.name || ""}`,
+            pdf.internal.pageSize.getWidth() - 80,
+            currentY
+          );
+          currentY += 8;
       
-  //         currentY += 8;
-  //         pdf.text(`المندوب: ${invoice.agentId?.name || ""}`, 10, currentY);
-  //         pdf.text(
-  //           `هاتف العميل: ${invoice.customerId?.phone || ""}`,
-  //           pdf.internal.pageSize.getWidth() - 80,
-  //           currentY
-  //         );
+          pdf.text(
+            `الاسم التجاري: ${invoice.customerId?.tradName || ""}`,
+            pdf.internal.pageSize.getWidth() - 80,
+            currentY
+          );
       
-  //         currentY += 8;
-  //         pdf.text(
-  //           `عنوان العميل: ${invoice.customerId?.address || ""}`,
-  //           pdf.internal.pageSize.getWidth() - 80,
-  //           currentY
-  //         );
+          currentY += 8;
+          pdf.text(`المندوب: ${invoice.agentId?.name || ""}`, 10, currentY);
+          pdf.text(
+            `هاتف العميل: ${invoice.customerId?.phone || ""}`,
+            pdf.internal.pageSize.getWidth() - 80,
+            currentY
+          );
       
-  //         return currentY + 10;
-  //       }
-  //       return 30;
-  //     };
+          currentY += 8;
+          pdf.text(
+            `عنوان العميل: ${invoice.customerId?.address || ""}`,
+            pdf.internal.pageSize.getWidth() - 80,
+            currentY
+          );
       
-  //     const itemTableData = invoice.items.map((item, idx) => {
-  //       const isOdd = idx % 2 === 0;
-  //       return [
-  //         isOdd ? item.productId.barcode : "",
-  //         item.quantity,
-  //         removeParentheses(item.productId.name),
-  //         !isOdd ? item.productId.barcode : ""
-  //       ];
-  //     });
+          return currentY + 10;
+        }
+        return 30;
+      };
+      
+      const itemTableData = invoice.items.map((item, idx) => {
+        const isOdd = idx % 2 === 0;
+        return [
+          isOdd ? item.productId.barcode : "",
+          item.quantity,
+          removeParentheses(item.productId.name),
+          !isOdd ? item.productId.barcode : ""
+        ];
+      });
 
-  //     const itemsPerPage = 30;
-  //     const totalPages = Math.ceil(itemTableData.length / itemsPerPage);
+      const itemsPerPage = 30;
+      const totalPages = Math.ceil(itemTableData.length / itemsPerPage);
 
-  //     if (invoiceIndex > 0) {
-  //       pdf.addPage();
-  //     }
+      if (invoiceIndex > 0) {
+        pdf.addPage();
+      }
+      interface CustomTableCellData {
+        column: {
+          index: number;
+        };
+        section: 'body' | 'head' | 'foot';
+        cell: {
+          raw: any;
+          x: number;
+          y: number;
+          width: number;
+          height: number;
+        };
+      }
+      
+      const totalQuantity = invoice.items.reduce((sum, item) => sum + item.quantity, 0);
 
-  //     const totalQuantity = invoice.items.reduce((sum, item) => sum + item.quantity, 0);
+      (pdf as any).autoTable({
+        startY: drawHeader(1, totalPages),
+        head: [['باركود', 'Q','المنتج' , 'باركود']],
+        body: itemTableData,
+        styles: {
+          font: 'Amiri-Bold',
+          fontStyle: 'bold',
+          fontSize: 14,
+          halign: 'center',
+          cellPadding: 2,
+          lineWidth: 0.1,
+          rowHeight: 12,
+          textColor: [0, 0, 0]
+        },
+        headStyles: {
+          fillColor: [255, 255, 255],
+          textColor: [0, 0, 0],
+          fontSize: 9,
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        columnStyles: {
+          0: { cellWidth: 40 },
+          1: { cellWidth: 40, halign: 'center' },
+          2: { cellWidth: 'auto'  },
+          3: { cellWidth: 40 }
+        },
+        
+        didDrawCell: (data : CustomTableCellData) => {
+          if ((data.column.index === 0 || data.column.index === 3) && data.section === 'body') {
+            const barcodeData = data.cell.raw;
+            if (barcodeData) {
+              try {
+                const canvas = document.createElement("canvas");
+                JsBarcode(canvas, barcodeData, {
+                  format: "CODE128",
+                  width: 1,
+                  height: 1,
+                  displayValue: false,
+                  fontSize: 6,
+                  margin: 1
+                });
+                const barcodeImg = canvas.toDataURL("image/png");
+                const { x, y, width, height } = data.cell;
+                pdf.addImage(barcodeImg, "PNG", x + 1, y + 1, width - 2, height - 2);
+              } catch (barcodeError) {
+                console.error(`Error generating barcode for ${barcodeData}:`, barcodeError);
+              }
+            }
+          }
+        },
+        margin: { top: 45 }
+      });
 
-  //     (pdf as any).autoTable({
-  //       startY: drawHeader(1, totalPages),
-  //       head: [['باركود', 'Q','المنتج' , 'باركود']],
-  //       body: itemTableData,
-  //       styles: {
-  //         font: 'Amiri-Bold',
-  //         fontStyle: 'bold',
-  //         fontSize: 14,
-  //         halign: 'center',
-  //         cellPadding: 2,
-  //         lineWidth: 0.1,
-  //         rowHeight: 12,
-  //         textColor: [0, 0, 0]
-  //       },
-  //       headStyles: {
-  //         fillColor: [255, 255, 255],
-  //         textColor: [0, 0, 0],
-  //         fontSize: 9,
-  //         fontStyle: 'bold',
-  //         halign: 'center'
-  //       },
-  //       columnStyles: {
-  //         0: { cellWidth: 40 },
-  //         1: { cellWidth: 40, halign: 'center' },
-  //         2: { cellWidth: 'auto'  },
-  //         3: { cellWidth: 40 }
-  //       },
-  //       didDrawCell: (data) => {
-  //         if ((data.column.index === 0 || data.column.index === 3) && data.section === 'body') {
-  //           const barcodeData = data.cell.raw;
-  //           if (barcodeData) {
-  //             try {
-  //               const canvas = document.createElement("canvas");
-  //               JsBarcode(canvas, barcodeData, {
-  //                 format: "CODE128",
-  //                 width: 1,
-  //                 height: 1,
-  //                 displayValue: false,
-  //                 fontSize: 6,
-  //                 margin: 1
-  //               });
-  //               const barcodeImg = canvas.toDataURL("image/png");
-  //               const { x, y, width, height } = data.cell;
-  //               pdf.addImage(barcodeImg, "PNG", x + 1, y + 1, width - 2, height - 2);
-  //             } catch (barcodeError) {
-  //               console.error(`Error generating barcode for ${barcodeData}:`, barcodeError);
-  //             }
-  //           }
-  //         }
-  //       },
-  //       margin: { top: 45 }
-  //     });
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      pdf.setFontSize(10);
+      pdf.text(`إجمالي المنتجات: ${totalQuantity}`, 10, pageHeight - 20);
+      pdf.setFontSize(8);
+      pdf.text("شكراً لتعاملكم معنا", pdf.internal.pageSize.getWidth() / 2, pageHeight - 10, { align: 'center' });
+    });
 
-  //     const pageHeight = pdf.internal.pageSize.getHeight();
-  //     pdf.setFontSize(10);
-  //     pdf.text(`إجمالي المنتجات: ${totalQuantity}`, 10, pageHeight - 20);
-  //     pdf.setFontSize(8);
-  //     pdf.text("شكراً لتعاملكم معنا", pdf.internal.pageSize.getWidth() / 2, pageHeight - 10, { align: 'center' });
-  //   });
-
-  //   pdf.save("invoices.pdf");
-  // } catch (error) {
-  //   console.error("Error during PDF generation:", error);
-  //   alert("حدث خطأ أثناء إنشاء ملف PDF");
-  // }
+    pdf.save("invoices.pdf");
+  } catch (error) {
+    console.error("Error during PDF generation:", error);
+    alert("حدث خطأ أثناء إنشاء ملف PDF");
+  }
 };
   return (
     <div className="w-full">
