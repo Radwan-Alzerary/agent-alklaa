@@ -23,12 +23,20 @@ const app = express();
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Define your allowed origin
-const allowedOrigin = 'http://localhost:3000';
+const allowedOrigins = ['http://localhost:3000', 'https://agent1.niuraiq.com/'];
 
 // CORS configuration
 const corsOptions = {
-  origin: allowedOrigin, // Specify the exact origin instead of '*'
-  credentials: true,     // Allow credentials (cookies, authorization headers, etc.)
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      // Allow requests from allowed origins or non-origin requests (like Postman)
+      callback(null, true);
+    } else {
+      // Reject requests from unallowed origins
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 };
 
 app.use(cors(corsOptions));
