@@ -23,25 +23,11 @@ const app = express();
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
-// Middleware
-// app.use(cors());
-const corsOptions = {
-  origin: [
-    /^(http:\/\/.+:8080)$/,
-    /^(http:\/\/.+:8085)$/,
-    /^(http:\/\/.+:80)$/,
-    /^(http:\/\/.+:3000)$/,
-    /^(http:\/\/.+:5000)$/,
-    /^(http:\/\/.+:3001)$/,
-    /^(http:\/\/.+:3100)$/,
-    /^(http:\/\/.+:443)$/,
-    'https://agent1.niuraiq.com/', // Add specific domai
-  ],
-  credentials: true,
-  "Access-Control-Allow-Credentials": true,
-};
-// Apply CORS middleware
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: 'https://agent1.niuraiq.com',   // your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 app.use(morgan('dev'));
