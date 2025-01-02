@@ -22,13 +22,16 @@ const app = express();
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Define your allowed origin
+const allowedOrigin = 'http://localhost:3000';
 
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: '*',
-  credentials: false,
-}));
+// CORS configuration
+const corsOptions = {
+  origin: allowedOrigin, // Specify the exact origin instead of '*'
+  credentials: true,     // Allow credentials (cookies, authorization headers, etc.)
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(morgan('dev'));
