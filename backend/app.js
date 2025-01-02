@@ -38,8 +38,11 @@ const corsOptions = {
   credentials: true,
   "Access-Control-Allow-Credentials": true,
 };
-
+// Apply CORS middleware
 app.use(cors(corsOptions));
+
+// If you need to allow preflight requests
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 app.use(morgan('dev'));
