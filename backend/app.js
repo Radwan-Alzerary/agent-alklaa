@@ -35,17 +35,13 @@ const corsOptions = {
     /^(http:\/\/.+:3001)$/,
     /^(http:\/\/.+:3100)$/,
     /^(http:\/\/.+:443)$/,
-    'https://agent1.niuraiq.com/', // Add specific domain
-
+    'https://agent1.niuraiq.com/', // Add specific domai
   ],
   credentials: true,
   "Access-Control-Allow-Credentials": true,
 };
 // Apply CORS middleware
 app.use(cors(corsOptions));
-
-// If you need to allow preflight requests
-app.options('*', cors(corsOptions));
 
 app.use(express.json());
 app.use(morgan('dev'));
