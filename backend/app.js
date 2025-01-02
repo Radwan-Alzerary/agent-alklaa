@@ -86,36 +86,40 @@ app.get("/exportdata", async (req, res) => {
     res.status(500).json({ error: "Error exporting models", details: error });
   }
 });
-
 app.get("/importdata", async (req, res) => {
   try {
-    const modelNames = mongoose.modelNames();
+    // Specify the models you want to import data for
+    const allowedModels = ["Agent", "Customer", "Product","User"];
 
-    for (const modelName of modelNames) {
+    for (const modelName of allowedModels) {
       const dataPath = `./backup/${modelName}.json`;
 
-      // Read the JSON data from the file
-      const rawData = fs.readFileSync(dataPath, "utf8");
-      const data = JSON.parse(rawData);
+      try {
+        // Read the JSON data from the file
+        const rawData = fs.readFileSync(dataPath, "utf8");
+        const data = JSON.parse(rawData);
 
-      const Model = mongoose.model(modelName);
+        // Get the model
+        const Model = mongoose.model(modelName);
 
-      // Clear existing data in the model (optional, depending on your needs)
-      await Model.deleteMany({});
+        // Clear existing data in the model (optional, depending on your needs)
+        await Model.deleteMany({});
 
-      // Insert the data into the model
-      await Model.insertMany(data);
+        // Insert the data into the model
+        await Model.insertMany(data);
 
-      console.log(`Imported data for ${modelName}`);
+        console.log(`Imported data for ${modelName}`);
+      } catch (error) {
+        console.error(`Error importing data for ${modelName}`, error);
+      }
     }
 
-    res.status(200).json({ message: "Data imported successfully" });
+    res.status(200).json({ message: "Data imported successfully for selected models" });
   } catch (error) {
     console.error("Error importing data", error);
     res.status(500).json({ error: "Error importing data", details: error });
   }
 });
-
 
 // Serve static files from the 'uploads' directory
 
